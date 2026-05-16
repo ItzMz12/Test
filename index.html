@@ -3,11 +3,12 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-<title>3D Rubik Cube</title>
+<title>Playable 3D Rubik Cube</title>
 
-<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap" rel="stylesheet">
 
 <style>
+
 *{
     margin:0;
     padding:0;
@@ -15,278 +16,243 @@
 }
 
 body{
-    height:100vh;
+    background:
+    radial-gradient(circle at top,#1f2a44,#090909 60%);
+    font-family:'Poppins',sans-serif;
     overflow:hidden;
+    height:100vh;
     display:flex;
     justify-content:center;
     align-items:center;
     flex-direction:column;
-    font-family:'Poppins',sans-serif;
-    background:
-    radial-gradient(circle at top left,#1f1c2c,#090909 60%),
-    linear-gradient(135deg,#0f2027,#203a43,#2c5364);
     color:white;
 }
 
-/* Background Glow */
-body::before{
-    content:"";
-    position:absolute;
-    width:500px;
-    height:500px;
-    background:#00fff2;
-    filter:blur(180px);
-    opacity:0.2;
-    border-radius:50%;
-    top:-100px;
-    left:-100px;
-}
-
-body::after{
-    content:"";
-    position:absolute;
-    width:400px;
-    height:400px;
-    background:#ff00ff;
-    filter:blur(160px);
-    opacity:0.15;
-    border-radius:50%;
-    bottom:-120px;
-    right:-120px;
-}
-
-.title{
-    position:absolute;
-    top:25px;
-    font-size:2rem;
-    font-weight:700;
+h1{
+    margin-bottom:20px;
+    font-size:2.2rem;
     letter-spacing:2px;
-    text-shadow:0 0 20px rgba(255,255,255,0.4);
+    text-shadow:0 0 20px cyan;
 }
 
-/* Scene */
 .scene{
-    width:250px;
-    height:250px;
-    perspective:1000px;
+    perspective:1200px;
+    width:320px;
+    height:320px;
 }
 
-/* Cube */
 .cube{
-    width:160px;
-    height:160px;
+    width:210px;
+    height:210px;
     position:relative;
     transform-style:preserve-3d;
     transform:rotateX(-25deg) rotateY(35deg);
-    animation:rotate 10s infinite linear;
     transition:1s ease;
+    margin:auto;
 }
 
-@keyframes rotate{
-    from{
-        transform:rotateX(-25deg) rotateY(0deg);
-    }
-    to{
-        transform:rotateX(-25deg) rotateY(360deg);
-    }
-}
-
-/* Faces */
 .face{
     position:absolute;
-    width:160px;
-    height:160px;
+    width:210px;
+    height:210px;
     display:grid;
     grid-template-columns:repeat(3,1fr);
     grid-template-rows:repeat(3,1fr);
-    gap:5px;
-    background:rgba(0,0,0,0.4);
-    padding:5px;
-    border:2px solid rgba(255,255,255,0.2);
-    backdrop-filter:blur(10px);
-    border-radius:10px;
-    box-shadow:
-        0 0 25px rgba(255,255,255,0.15),
-        inset 0 0 15px rgba(255,255,255,0.08);
-}
-
-/* Cube Tiles */
-.face div{
-    border-radius:6px;
+    gap:4px;
+    background:#111;
+    padding:4px;
+    border-radius:12px;
     border:2px solid rgba(255,255,255,0.15);
-    box-shadow:
-        inset 0 0 10px rgba(255,255,255,0.25),
-        0 0 8px rgba(0,0,0,0.4);
+    box-shadow:0 0 20px rgba(255,255,255,0.1);
 }
 
-/* Face Colors */
-.front div{ background:#00ffcc; }
-.back div{ background:#ff2d75; }
-.right div{ background:#ffae00; }
-.left div{ background:#6a5cff; }
-.top div{ background:#ffffff; }
-.bottom div{ background:#32ff7e; }
-
-/* Position Faces */
-.front{
-    transform:translateZ(80px);
+.tile{
+    border-radius:8px;
+    border:2px solid rgba(255,255,255,0.15);
+    cursor:pointer;
+    transition:0.2s;
 }
 
-.back{
-    transform:rotateY(180deg) translateZ(80px);
+.tile:hover{
+    transform:scale(1.06);
+    filter:brightness(1.2);
 }
 
-.right{
-    transform:rotateY(90deg) translateZ(80px);
-}
+/* Faces Position */
 
-.left{
-    transform:rotateY(-90deg) translateZ(80px);
-}
+.front{ transform:translateZ(105px); }
+.back{ transform:rotateY(180deg) translateZ(105px); }
+.right{ transform:rotateY(90deg) translateZ(105px); }
+.left{ transform:rotateY(-90deg) translateZ(105px); }
+.top{ transform:rotateX(90deg) translateZ(105px); }
+.bottom{ transform:rotateX(-90deg) translateZ(105px); }
 
-.top{
-    transform:rotateX(90deg) translateZ(80px);
-}
-
-.bottom{
-    transform:rotateX(-90deg) translateZ(80px);
-}
-
-/* Buttons */
 .controls{
-    margin-top:50px;
+    margin-top:30px;
     display:flex;
-    gap:20px;
-    z-index:10;
+    gap:15px;
+    flex-wrap:wrap;
+    justify-content:center;
 }
 
 button{
-    padding:14px 28px;
+    padding:14px 24px;
     border:none;
     border-radius:14px;
     font-size:1rem;
     font-weight:600;
-    color:white;
     cursor:pointer;
-    transition:0.3s;
-    backdrop-filter:blur(10px);
+    color:white;
     background:rgba(255,255,255,0.1);
+    backdrop-filter:blur(10px);
     border:1px solid rgba(255,255,255,0.2);
-    box-shadow:0 0 15px rgba(255,255,255,0.1);
+    transition:0.3s;
 }
 
 button:hover{
-    transform:translateY(-4px) scale(1.05);
-    box-shadow:
-    0 0 25px rgba(0,255,255,0.4),
-    0 0 40px rgba(255,0,255,0.25);
+    transform:translateY(-4px);
+    box-shadow:0 0 20px cyan;
 }
 
-/* Shuffle Animation */
-.shuffle{
-    animation:shuffleAnim 1s ease-in-out infinite;
-}
-
-@keyframes shuffleAnim{
-    0%{
-        transform:rotateX(0deg) rotateY(0deg);
-    }
-    25%{
-        transform:rotateX(90deg) rotateY(180deg);
-    }
-    50%{
-        transform:rotateX(180deg) rotateY(90deg);
-    }
-    75%{
-        transform:rotateX(270deg) rotateY(270deg);
-    }
-    100%{
-        transform:rotateX(360deg) rotateY(360deg);
-    }
+.info{
+    margin-top:15px;
+    opacity:0.8;
+    font-size:0.9rem;
 }
 
 </style>
 </head>
-
 <body>
 
-<div class="title">3D RUBIK CUBE</div>
+<h1>3D PLAYABLE RUBIK CUBE</h1>
 
 <div class="scene">
     <div class="cube" id="cube">
 
-        <div class="face front">
-            <div></div><div></div><div></div>
-            <div></div><div></div><div></div>
-            <div></div><div></div><div></div>
-        </div>
-
-        <div class="face back">
-            <div></div><div></div><div></div>
-            <div></div><div></div><div></div>
-            <div></div><div></div><div></div>
-        </div>
-
-        <div class="face right">
-            <div></div><div></div><div></div>
-            <div></div><div></div><div></div>
-            <div></div><div></div><div></div>
-        </div>
-
-        <div class="face left">
-            <div></div><div></div><div></div>
-            <div></div><div></div><div></div>
-            <div></div><div></div><div></div>
-        </div>
-
-        <div class="face top">
-            <div></div><div></div><div></div>
-            <div></div><div></div><div></div>
-            <div></div><div></div><div></div>
-        </div>
-
-        <div class="face bottom">
-            <div></div><div></div><div></div>
-            <div></div><div></div><div></div>
-            <div></div><div></div><div></div>
-        </div>
+        <div class="face front" id="front"></div>
+        <div class="face back" id="back"></div>
+        <div class="face right" id="right"></div>
+        <div class="face left" id="left"></div>
+        <div class="face top" id="top"></div>
+        <div class="face bottom" id="bottom"></div>
 
     </div>
 </div>
 
 <div class="controls">
+    <button onclick="rotateCube('x')">Rotate X</button>
+    <button onclick="rotateCube('y')">Rotate Y</button>
+    <button onclick="shuffleCube()">Unsolve Cube</button>
     <button onclick="solveCube()">Solve Cube</button>
-    <button onclick="unsolveCube()">Unsolve Cube</button>
+</div>
+
+<div class="info">
+Tap tiles to change colors manually
 </div>
 
 <script>
 
-const cube = document.getElementById("cube");
+const colors = [
+    "#00ffc3",
+    "#ff4757",
+    "#ffa502",
+    "#3742fa",
+    "#ffffff",
+    "#2ed573"
+];
 
-function solveCube(){
-    cube.classList.remove("shuffle");
+const faces = ["front","back","right","left","top","bottom"];
 
-    cube.style.transition = "1.5s ease";
+let currentX = -25;
+let currentY = 35;
 
-    cube.style.transform =
-    "rotateX(-25deg) rotateY(35deg)";
+function createCube(){
+
+    faces.forEach((face,index)=>{
+
+        const faceElement = document.getElementById(face);
+
+        for(let i=0;i<9;i++){
+
+            const tile = document.createElement("div");
+
+            tile.classList.add("tile");
+
+            tile.style.background = colors[index];
+
+            tile.dataset.colorIndex = index;
+
+            tile.addEventListener("click",()=>{
+
+                let next =
+                (parseInt(tile.dataset.colorIndex)+1)%colors.length;
+
+                tile.dataset.colorIndex = next;
+
+                tile.style.background = colors[next];
+
+            });
+
+            faceElement.appendChild(tile);
+        }
+    });
 }
 
-function unsolveCube(){
+createCube();
 
-    cube.classList.add("shuffle");
+function rotateCube(axis){
 
-    setTimeout(() => {
+    const cube = document.getElementById("cube");
 
-        cube.classList.remove("shuffle");
+    if(axis === "x"){
+        currentX += 90;
+    }else{
+        currentY += 90;
+    }
 
-        const x = Math.floor(Math.random() * 360);
-        const y = Math.floor(Math.random() * 360);
+    cube.style.transform =
+    `rotateX(${currentX}deg) rotateY(${currentY}deg)`;
+}
 
-        cube.style.transform =
-        `rotateX(${x}deg) rotateY(${y}deg)`;
+function shuffleCube(){
 
-    }, 2500);
+    document.querySelectorAll(".tile").forEach(tile=>{
+
+        const random =
+        Math.floor(Math.random()*colors.length);
+
+        tile.style.background = colors[random];
+
+        tile.dataset.colorIndex = random;
+    });
+
+    currentX += 180;
+    currentY += 180;
+
+    document.getElementById("cube").style.transform =
+    `rotateX(${currentX}deg) rotateY(${currentY}deg)`;
+}
+
+function solveCube(){
+
+    faces.forEach((face,index)=>{
+
+        const tiles =
+        document.querySelectorAll(`#${face} .tile`);
+
+        tiles.forEach(tile=>{
+
+            tile.style.background = colors[index];
+
+            tile.dataset.colorIndex = index;
+        });
+    });
+
+    currentX = -25;
+    currentY = 35;
+
+    document.getElementById("cube").style.transform =
+    `rotateX(${currentX}deg) rotateY(${currentY}deg)`;
 }
 
 </script>
