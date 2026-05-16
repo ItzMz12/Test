@@ -3,9 +3,7 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-<title>Playable 3D Rubik Cube</title>
-
-<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap" rel="stylesheet">
+<title>Real 3D Rubik Cube</title>
 
 <style>
 
@@ -16,244 +14,331 @@
 }
 
 body{
-    background:
-    radial-gradient(circle at top,#1f2a44,#090909 60%);
-    font-family:'Poppins',sans-serif;
     overflow:hidden;
     height:100vh;
     display:flex;
     justify-content:center;
     align-items:center;
     flex-direction:column;
+    background:
+    radial-gradient(circle at top,#182848,#050505 60%);
+    font-family:Arial, sans-serif;
     color:white;
 }
 
 h1{
     margin-bottom:20px;
-    font-size:2.2rem;
+    text-shadow:0 0 15px cyan;
     letter-spacing:2px;
-    text-shadow:0 0 20px cyan;
 }
 
 .scene{
-    perspective:1200px;
     width:320px;
     height:320px;
+    perspective:1200px;
 }
 
-.cube{
-    width:210px;
-    height:210px;
+#cube{
+    width:180px;
+    height:180px;
     position:relative;
     transform-style:preserve-3d;
-    transform:rotateX(-25deg) rotateY(35deg);
-    transition:1s ease;
+    transform:rotateX(-30deg) rotateY(-30deg);
     margin:auto;
+    transition:0.4s;
+}
+
+.cubie{
+    position:absolute;
+    width:60px;
+    height:60px;
+    transform-style:preserve-3d;
 }
 
 .face{
     position:absolute;
-    width:210px;
-    height:210px;
-    display:grid;
-    grid-template-columns:repeat(3,1fr);
-    grid-template-rows:repeat(3,1fr);
-    gap:4px;
-    background:#111;
-    padding:4px;
-    border-radius:12px;
-    border:2px solid rgba(255,255,255,0.15);
-    box-shadow:0 0 20px rgba(255,255,255,0.1);
+    width:60px;
+    height:60px;
+    border:2px solid #000;
+    border-radius:6px;
+    opacity:0.98;
 }
 
-.tile{
-    border-radius:8px;
-    border:2px solid rgba(255,255,255,0.15);
-    cursor:pointer;
-    transition:0.2s;
-}
+/* FACE COLORS */
 
-.tile:hover{
-    transform:scale(1.06);
-    filter:brightness(1.2);
-}
+.white{ background:#fff; }
+.yellow{ background:#ffd32a; }
+.red{ background:#ff3f34; }
+.orange{ background:#ff9f1a; }
+.blue{ background:#3742fa; }
+.green{ background:#2ed573; }
+.black{ background:#111; }
 
-/* Faces Position */
+/* POSITION FACES */
 
-.front{ transform:translateZ(105px); }
-.back{ transform:rotateY(180deg) translateZ(105px); }
-.right{ transform:rotateY(90deg) translateZ(105px); }
-.left{ transform:rotateY(-90deg) translateZ(105px); }
-.top{ transform:rotateX(90deg) translateZ(105px); }
-.bottom{ transform:rotateX(-90deg) translateZ(105px); }
+.front  { transform:translateZ(30px); }
+.back   { transform:rotateY(180deg) translateZ(30px); }
+.right  { transform:rotateY(90deg) translateZ(30px); }
+.left   { transform:rotateY(-90deg) translateZ(30px); }
+.top    { transform:rotateX(90deg) translateZ(30px); }
+.bottom { transform:rotateX(-90deg) translateZ(30px); }
 
 .controls{
-    margin-top:30px;
+    margin-top:25px;
     display:flex;
-    gap:15px;
     flex-wrap:wrap;
     justify-content:center;
+    gap:10px;
+    width:90%;
+    max-width:500px;
 }
 
 button{
-    padding:14px 24px;
+    padding:10px 16px;
     border:none;
-    border-radius:14px;
-    font-size:1rem;
-    font-weight:600;
-    cursor:pointer;
+    border-radius:10px;
+    background:#111;
     color:white;
-    background:rgba(255,255,255,0.1);
-    backdrop-filter:blur(10px);
-    border:1px solid rgba(255,255,255,0.2);
-    transition:0.3s;
+    cursor:pointer;
+    font-weight:bold;
+    transition:0.2s;
+    border:1px solid rgba(255,255,255,0.15);
 }
 
 button:hover{
-    transform:translateY(-4px);
-    box-shadow:0 0 20px cyan;
+    transform:scale(1.08);
+    background:#222;
+    box-shadow:0 0 15px cyan;
 }
 
 .info{
     margin-top:15px;
-    opacity:0.8;
-    font-size:0.9rem;
+    opacity:0.7;
+    font-size:14px;
 }
 
 </style>
 </head>
 <body>
 
-<h1>3D PLAYABLE RUBIK CUBE</h1>
+<h1>REAL 3D RUBIK CUBE</h1>
 
 <div class="scene">
-    <div class="cube" id="cube">
-
-        <div class="face front" id="front"></div>
-        <div class="face back" id="back"></div>
-        <div class="face right" id="right"></div>
-        <div class="face left" id="left"></div>
-        <div class="face top" id="top"></div>
-        <div class="face bottom" id="bottom"></div>
-
-    </div>
+    <div id="cube"></div>
 </div>
 
 <div class="controls">
-    <button onclick="rotateCube('x')">Rotate X</button>
-    <button onclick="rotateCube('y')">Rotate Y</button>
-    <button onclick="shuffleCube()">Unsolve Cube</button>
-    <button onclick="solveCube()">Solve Cube</button>
+
+<button onclick="move('R')">R</button>
+<button onclick="move('L')">L</button>
+<button onclick="move('U')">U</button>
+<button onclick="move('D')">D</button>
+<button onclick="move('F')">F</button>
+<button onclick="move('B')">B</button>
+
+<button onclick="move('Ri')">R'</button>
+<button onclick="move('Li')">L'</button>
+<button onclick="move('Ui')">U'</button>
+<button onclick="move('Di')">D'</button>
+<button onclick="move('Fi')">F'</button>
+<button onclick="move('Bi')">B'</button>
+
+<button onclick="shuffleCube()">Shuffle</button>
+<button onclick="resetCube()">Solve</button>
+
 </div>
 
 <div class="info">
-Tap tiles to change colors manually
+Drag mouse to rotate whole cube
 </div>
 
 <script>
 
-const colors = [
-    "#00ffc3",
-    "#ff4757",
-    "#ffa502",
-    "#3742fa",
-    "#ffffff",
-    "#2ed573"
-];
+const cube = document.getElementById("cube");
 
-const faces = ["front","back","right","left","top","bottom"];
+let rotateX = -30;
+let rotateY = -30;
 
-let currentX = -25;
-let currentY = 35;
+let cubies = [];
+
+/* CREATE 27 SMALL CUBES */
 
 function createCube(){
 
-    faces.forEach((face,index)=>{
+    cube.innerHTML = "";
+    cubies = [];
 
-        const faceElement = document.getElementById(face);
+    for(let x=-1;x<=1;x++){
+        for(let y=-1;y<=1;y++){
+            for(let z=-1;z<=1;z++){
 
-        for(let i=0;i<9;i++){
+                const cubie = document.createElement("div");
+                cubie.className = "cubie";
 
-            const tile = document.createElement("div");
+                cubie.x = x;
+                cubie.y = y;
+                cubie.z = z;
 
-            tile.classList.add("tile");
+                createFace(cubie,"front", z===1 ? "green":"black");
+                createFace(cubie,"back", z===-1 ? "blue":"black");
+                createFace(cubie,"right", x===1 ? "red":"black");
+                createFace(cubie,"left", x===-1 ? "orange":"black");
+                createFace(cubie,"top", y===-1 ? "white":"black");
+                createFace(cubie,"bottom", y===1 ? "yellow":"black");
 
-            tile.style.background = colors[index];
+                updatePosition(cubie);
 
-            tile.dataset.colorIndex = index;
+                cube.appendChild(cubie);
 
-            tile.addEventListener("click",()=>{
-
-                let next =
-                (parseInt(tile.dataset.colorIndex)+1)%colors.length;
-
-                tile.dataset.colorIndex = next;
-
-                tile.style.background = colors[next];
-
-            });
-
-            faceElement.appendChild(tile);
+                cubies.push(cubie);
+            }
         }
-    });
+    }
+}
+
+function createFace(cubie,side,color){
+
+    const face = document.createElement("div");
+
+    face.className = `face ${side} ${color}`;
+
+    cubie.appendChild(face);
+}
+
+function updatePosition(cubie){
+
+    cubie.style.transform =
+    `
+    translate3d(
+    ${cubie.x*60}px,
+    ${cubie.y*60}px,
+    ${cubie.z*60}px
+    )
+    `;
 }
 
 createCube();
 
-function rotateCube(axis){
+/* REAL ROTATIONS */
 
-    const cube = document.getElementById("cube");
+function rotateLayer(axis, layer, clockwise=true){
 
-    if(axis === "x"){
-        currentX += 90;
-    }else{
-        currentY += 90;
-    }
+    cubies.forEach(c=>{
 
-    cube.style.transform =
-    `rotateX(${currentX}deg) rotateY(${currentY}deg)`;
+        if(c[axis] === layer){
+
+            let x = c.x;
+            let y = c.y;
+            let z = c.z;
+
+            if(axis==="x"){
+
+                c.y = clockwise ? -z : z;
+                c.z = clockwise ? y : -y;
+            }
+
+            if(axis==="y"){
+
+                c.x = clockwise ? z : -z;
+                c.z = clockwise ? -x : x;
+            }
+
+            if(axis==="z"){
+
+                c.x = clockwise ? -y : y;
+                c.y = clockwise ? x : -x;
+            }
+
+            updatePosition(c);
+        }
+    });
 }
+
+/* MOVE SYSTEM */
+
+function move(m){
+
+    switch(m){
+
+        case "R": rotateLayer("x",1,true); break;
+        case "Ri": rotateLayer("x",1,false); break;
+
+        case "L": rotateLayer("x",-1,false); break;
+        case "Li": rotateLayer("x",-1,true); break;
+
+        case "U": rotateLayer("y",-1,true); break;
+        case "Ui": rotateLayer("y",-1,false); break;
+
+        case "D": rotateLayer("y",1,false); break;
+        case "Di": rotateLayer("y",1,true); break;
+
+        case "F": rotateLayer("z",1,true); break;
+        case "Fi": rotateLayer("z",1,false); break;
+
+        case "B": rotateLayer("z",-1,false); break;
+        case "Bi": rotateLayer("z",-1,true); break;
+    }
+}
+
+/* SHUFFLE */
 
 function shuffleCube(){
 
-    document.querySelectorAll(".tile").forEach(tile=>{
+    const moves = [
+    "R","L","U","D","F","B",
+    "Ri","Li","Ui","Di","Fi","Bi"
+    ];
+
+    for(let i=0;i<20;i++){
 
         const random =
-        Math.floor(Math.random()*colors.length);
+        moves[Math.floor(Math.random()*moves.length)];
 
-        tile.style.background = colors[random];
-
-        tile.dataset.colorIndex = random;
-    });
-
-    currentX += 180;
-    currentY += 180;
-
-    document.getElementById("cube").style.transform =
-    `rotateX(${currentX}deg) rotateY(${currentY}deg)`;
+        move(random);
+    }
 }
 
-function solveCube(){
+/* RESET */
 
-    faces.forEach((face,index)=>{
+function resetCube(){
 
-        const tiles =
-        document.querySelectorAll(`#${face} .tile`);
-
-        tiles.forEach(tile=>{
-
-            tile.style.background = colors[index];
-
-            tile.dataset.colorIndex = index;
-        });
-    });
-
-    currentX = -25;
-    currentY = 35;
-
-    document.getElementById("cube").style.transform =
-    `rotateX(${currentX}deg) rotateY(${currentY}deg)`;
+    createCube();
 }
+
+/* MOUSE ROTATION */
+
+let dragging = false;
+let lastX,lastY;
+
+document.addEventListener("mousedown",(e)=>{
+
+    dragging = true;
+
+    lastX = e.clientX;
+    lastY = e.clientY;
+});
+
+document.addEventListener("mouseup",()=>{
+
+    dragging = false;
+});
+
+document.addEventListener("mousemove",(e)=>{
+
+    if(!dragging) return;
+
+    let dx = e.clientX - lastX;
+    let dy = e.clientY - lastY;
+
+    rotateY += dx * 0.5;
+    rotateX -= dy * 0.5;
+
+    cube.style.transform =
+    `rotateX(${rotateX}deg) rotateY(${rotateY}deg)`;
+
+    lastX = e.clientX;
+    lastY = e.clientY;
+});
 
 </script>
 
