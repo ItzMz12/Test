@@ -2,342 +2,676 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-<title>Real 3D Rubik Cube</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Cosmic Portfolio</title>
+
+<link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;600;700;800&family=Poppins:wght@300;400;500;600&display=swap" rel="stylesheet">
 
 <style>
-
 *{
     margin:0;
     padding:0;
     box-sizing:border-box;
+    scroll-behavior:smooth;
+}
+
+:root{
+    --bg:#020412;
+    --glass:rgba(255,255,255,0.08);
+    --text:#ffffff;
+    --accent:#00d9ff;
+    --accent2:#8a2eff;
 }
 
 body{
+    background:var(--bg);
+    overflow-x:hidden;
+    font-family:'Poppins',sans-serif;
+    color:var(--text);
+}
+
+/* SCROLL BAR */
+::-webkit-scrollbar{
+    width:10px;
+}
+
+::-webkit-scrollbar-thumb{
+    background:linear-gradient(to bottom,#00d9ff,#8a2eff);
+    border-radius:20px;
+}
+
+/* SPACE BACKGROUND */
+.space{
+    position:fixed;
+    inset:0;
     overflow:hidden;
-    height:100vh;
-    display:flex;
-    justify-content:center;
-    align-items:center;
-    flex-direction:column;
+    z-index:-10;
     background:
-    radial-gradient(circle at top,#182848,#050505 60%);
-    font-family:Arial, sans-serif;
-    color:white;
+    radial-gradient(circle at top,#112 0%,#050816 35%,#010104 100%);
 }
 
-h1{
-    margin-bottom:20px;
-    text-shadow:0 0 15px cyan;
-    letter-spacing:2px;
+.stars{
+    position:absolute;
+    width:200%;
+    height:200%;
+    background-image:
+    radial-gradient(white 1px,transparent 1px),
+    radial-gradient(white 1px,transparent 1px),
+    radial-gradient(rgba(255,255,255,0.5) 1px,transparent 1px);
+    background-size:120px 120px,180px 180px,250px 250px;
+    animation:moveStars 120s linear infinite;
+    opacity:0.7;
 }
 
-.scene{
-    width:320px;
-    height:320px;
-    perspective:1200px;
+@keyframes moveStars{
+    from{transform:translateY(0px) translateX(0px);}
+    to{transform:translateY(-600px) translateX(-300px);}
 }
 
-#cube{
-    width:180px;
-    height:180px;
+/* EARTH */
+.earth-wrapper{
+    position:fixed;
+    top:50%;
+    right:-140px;
+    transform:translateY(-50%);
+    z-index:-1;
+}
+
+.earth{
+    width:520px;
+    height:520px;
+    border-radius:50%;
+    background:
+    url('https://images.unsplash.com/photo-1614730321146-b6fa6a46bcb4?q=80&w=1200&auto=format&fit=crop') center/cover;
+    box-shadow:
+    inset -90px 0px 70px rgba(0,0,0,0.8),
+    0 0 60px rgba(0,217,255,0.5),
+    0 0 120px rgba(0,217,255,0.25);
+    animation:rotateEarth 45s linear infinite;
     position:relative;
-    transform-style:preserve-3d;
-    transform:rotateX(-30deg) rotateY(-30deg);
-    margin:auto;
+}
+
+.earth::before{
+    content:'';
+    position:absolute;
+    inset:-30px;
+    border-radius:50%;
+    border:2px solid rgba(255,255,255,0.1);
+    animation:orbit 15s linear infinite;
+}
+
+@keyframes orbit{
+    from{transform:rotate(0deg);}
+    to{transform:rotate(360deg);}
+}
+
+@keyframes rotateEarth{
+    from{background-position:0 0;}
+    to{background-position:1000px 0;}
+}
+
+/* NAVBAR */
+nav{
+    position:fixed;
+    top:0;
+    width:100%;
+    padding:22px 8%;
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    z-index:1000;
+    backdrop-filter:blur(15px);
+    background:rgba(0,0,0,0.2);
+    border-bottom:1px solid rgba(255,255,255,0.1);
+}
+
+.logo{
+    font-size:2rem;
+    font-family:'Orbitron',sans-serif;
+    font-weight:800;
+    letter-spacing:2px;
+    background:linear-gradient(to right,#00d9ff,#8a2eff);
+    -webkit-background-clip:text;
+    -webkit-text-fill-color:transparent;
+}
+
+nav ul{
+    display:flex;
+    gap:30px;
+    list-style:none;
+}
+
+nav a{
+    text-decoration:none;
+    color:white;
+    transition:0.4s;
+    font-weight:500;
+    position:relative;
+}
+
+nav a::after{
+    content:'';
+    position:absolute;
+    left:0;
+    bottom:-6px;
+    width:0;
+    height:2px;
+    background:#00d9ff;
     transition:0.4s;
 }
 
-.cubie{
-    position:absolute;
-    width:60px;
-    height:60px;
-    transform-style:preserve-3d;
+nav a:hover::after{
+    width:100%;
 }
 
-.face{
-    position:absolute;
-    width:60px;
-    height:60px;
-    border:2px solid #000;
-    border-radius:6px;
-    opacity:0.98;
+/* SECTION */
+section{
+    min-height:100vh;
+    padding:120px 10%;
+    position:relative;
 }
 
-/* FACE COLORS */
-
-.white{ background:#fff; }
-.yellow{ background:#ffd32a; }
-.red{ background:#ff3f34; }
-.orange{ background:#ff9f1a; }
-.blue{ background:#3742fa; }
-.green{ background:#2ed573; }
-.black{ background:#111; }
-
-/* POSITION FACES */
-
-.front  { transform:translateZ(30px); }
-.back   { transform:rotateY(180deg) translateZ(30px); }
-.right  { transform:rotateY(90deg) translateZ(30px); }
-.left   { transform:rotateY(-90deg) translateZ(30px); }
-.top    { transform:rotateX(90deg) translateZ(30px); }
-.bottom { transform:rotateX(-90deg) translateZ(30px); }
-
-.controls{
-    margin-top:25px;
+.hero{
     display:flex;
-    flex-wrap:wrap;
+    flex-direction:column;
     justify-content:center;
-    gap:10px;
-    width:90%;
-    max-width:500px;
 }
 
-button{
-    padding:10px 16px;
-    border:none;
-    border-radius:10px;
-    background:#111;
+.hero h1{
+    font-size:5.5rem;
+    line-height:1;
+    font-family:'Orbitron',sans-serif;
+    text-transform:uppercase;
+    max-width:800px;
+}
+
+.hero h1 span{
+    background:linear-gradient(to right,#00d9ff,#8a2eff,#ff2d95);
+    -webkit-background-clip:text;
+    -webkit-text-fill-color:transparent;
+}
+
+.hero p{
+    margin-top:25px;
+    max-width:650px;
+    font-size:1.1rem;
+    line-height:1.8;
+    color:#d4d4d4;
+}
+
+.buttons{
+    margin-top:40px;
+    display:flex;
+    gap:20px;
+}
+
+.btn{
+    padding:16px 32px;
+    border-radius:50px;
+    text-decoration:none;
+    font-weight:600;
+    transition:0.4s;
+    position:relative;
+    overflow:hidden;
+}
+
+.primary{
+    background:linear-gradient(to right,#00d9ff,#8a2eff);
     color:white;
-    cursor:pointer;
-    font-weight:bold;
-    transition:0.2s;
-    border:1px solid rgba(255,255,255,0.15);
+    box-shadow:0 0 30px rgba(0,217,255,0.4);
 }
 
-button:hover{
-    transform:scale(1.08);
-    background:#222;
-    box-shadow:0 0 15px cyan;
+.secondary{
+    border:1px solid rgba(255,255,255,0.3);
+    color:white;
+    backdrop-filter:blur(10px);
 }
 
-.info{
-    margin-top:15px;
-    opacity:0.7;
-    font-size:14px;
+.btn:hover{
+    transform:translateY(-5px) scale(1.03);
+}
+
+/* GLASS CARDS */
+.grid{
+    display:grid;
+    grid-template-columns:repeat(auto-fit,minmax(280px,1fr));
+    gap:30px;
+    margin-top:60px;
+}
+
+.card{
+    padding:35px;
+    border-radius:30px;
+    background:var(--glass);
+    border:1px solid rgba(255,255,255,0.08);
+    backdrop-filter:blur(20px);
+    transition:0.5s;
+    position:relative;
+    overflow:hidden;
+}
+
+.card::before{
+    content:'';
+    position:absolute;
+    width:200px;
+    height:200px;
+    background:radial-gradient(circle,#00d9ff55,transparent 70%);
+    top:-100px;
+    right:-100px;
+}
+
+.card:hover{
+    transform:translateY(-10px) rotateX(5deg);
+    box-shadow:0 15px 40px rgba(0,217,255,0.15);
+}
+
+.card h2{
+    font-size:1.6rem;
+    margin-bottom:15px;
+}
+
+.card p{
+    color:#d8d8d8;
+    line-height:1.8;
+}
+
+.section-title{
+    font-size:3.2rem;
+    font-family:'Orbitron',sans-serif;
+    margin-bottom:20px;
+}
+
+.section-title span{
+    color:#00d9ff;
+}
+
+/* FLOATING LIGHTS */
+.light{
+    position:absolute;
+    border-radius:50%;
+    filter:blur(70px);
+    opacity:0.3;
+}
+
+.light1{
+    width:300px;
+    height:300px;
+    background:#00d9ff;
+    top:20%;
+    left:-120px;
+}
+
+.light2{
+    width:280px;
+    height:280px;
+    background:#8a2eff;
+    bottom:10%;
+    right:-100px;
+}
+
+/* PROJECT SHOWCASE */
+.projects{
+    display:grid;
+    grid-template-columns:repeat(auto-fit,minmax(320px,1fr));
+    gap:35px;
+    margin-top:60px;
+}
+
+.project{
+    height:420px;
+    border-radius:35px;
+    overflow:hidden;
+    position:relative;
+    border:1px solid rgba(255,255,255,0.08);
+    transition:0.5s;
+}
+
+.project img{
+    width:100%;
+    height:100%;
+    object-fit:cover;
+    transition:1s;
+}
+
+.project:hover img{
+    transform:scale(1.15);
+}
+
+.overlay{
+    position:absolute;
+    inset:0;
+    background:linear-gradient(to top,rgba(0,0,0,0.9),transparent);
+    display:flex;
+    flex-direction:column;
+    justify-content:flex-end;
+    padding:30px;
+}
+
+.overlay h3{
+    font-size:2rem;
+    margin-bottom:10px;
+}
+
+.overlay p{
+    color:#ccc;
+}
+
+.project:hover{
+    transform:translateY(-10px);
+    box-shadow:0 20px 60px rgba(0,217,255,0.15);
+}
+
+/* FOOTER */
+footer{
+    padding:50px 10%;
+    text-align:center;
+    color:#aaa;
+    border-top:1px solid rgba(255,255,255,0.1);
+    background:rgba(0,0,0,0.25);
+    backdrop-filter:blur(20px);
+}
+
+/* SCROLL ANIMATIONS */
+.hidden{
+    opacity:0;
+    transform:translateY(80px) scale(0.95);
+    transition:all 1s ease;
+}
+
+.show{
+    opacity:1;
+    transform:translateY(0px) scale(1);
+}
+
+/* PARALLAX */
+.parallax{
+    transform:translateY(calc(var(--scroll) * 0.15px));
+}
+
+/* RESPONSIVE */
+@media(max-width:1000px){
+
+.hero h1{
+    font-size:3.8rem;
+}
+
+.earth{
+    width:350px;
+    height:350px;
+}
+
+.earth-wrapper{
+    right:-120px;
+}
+
+nav ul{
+    gap:18px;
+}
+
+}
+
+@media(max-width:700px){
+
+.hero h1{
+    font-size:2.8rem;
+}
+
+.buttons{
+    flex-direction:column;
+    width:100%;
+}
+
+.btn{
+    text-align:center;
+}
+
+nav{
+    flex-direction:column;
+    gap:18px;
+}
+
+.earth{
+    width:250px;
+    height:250px;
+}
+
+.section-title{
+    font-size:2.3rem;
+}
+
 }
 
 </style>
 </head>
 <body>
 
-<h1>REAL 3D RUBIK CUBE</h1>
-
-<div class="scene">
-    <div id="cube"></div>
+<div class="space">
+    <div class="stars"></div>
 </div>
 
-<div class="controls">
-
-<button onclick="move('R')">R</button>
-<button onclick="move('L')">L</button>
-<button onclick="move('U')">U</button>
-<button onclick="move('D')">D</button>
-<button onclick="move('F')">F</button>
-<button onclick="move('B')">B</button>
-
-<button onclick="move('Ri')">R'</button>
-<button onclick="move('Li')">L'</button>
-<button onclick="move('Ui')">U'</button>
-<button onclick="move('Di')">D'</button>
-<button onclick="move('Fi')">F'</button>
-<button onclick="move('Bi')">B'</button>
-
-<button onclick="shuffleCube()">Shuffle</button>
-<button onclick="resetCube()">Solve</button>
-
+<div class="earth-wrapper parallax">
+    <div class="earth"></div>
 </div>
 
-<div class="info">
-Drag mouse to rotate whole cube
-</div>
+<nav>
+    <div class="logo">COSMIC</div>
+
+    <ul>
+        <li><a href="#home">Home</a></li>
+        <li><a href="#about">About</a></li>
+        <li><a href="#services">Services</a></li>
+        <li><a href="#projects">Projects</a></li>
+        <li><a href="#contact">Contact</a></li>
+    </ul>
+</nav>
+
+<section class="hero" id="home">
+
+    <div class="light light1"></div>
+    <div class="light light2"></div>
+
+    <div class="hidden">
+        <h1>
+            BUILDING <span>FUTURE</span> EXPERIENCES
+        </h1>
+
+        <p>
+            A next-generation animated portfolio with cinematic scrolling effects, glowing UI, moving Earth in deep space, glassmorphism cards, advanced parallax motion and futuristic design aesthetics.
+        </p>
+
+        <div class="buttons">
+            <a href="#projects" class="btn primary">Explore Projects</a>
+            <a href="#contact" class="btn secondary">Contact Me</a>
+        </div>
+    </div>
+
+</section>
+
+<section id="about">
+
+    <div class="hidden">
+        <h2 class="section-title">About <span>Me</span></h2>
+
+        <div class="grid">
+
+            <div class="card">
+                <h2>Creative Developer</h2>
+                <p>
+                    I design visually immersive websites with cinematic motion effects, futuristic UI systems, responsive layouts and interactive experiences.
+                </p>
+            </div>
+
+            <div class="card">
+                <h2>3D Animation</h2>
+                <p>
+                    Dynamic lighting, smooth transitions, scroll-triggered reveals and advanced layered depth effects create a premium experience.
+                </p>
+            </div>
+
+            <div class="card">
+                <h2>Modern Technology</h2>
+                <p>
+                    Built using modern HTML, CSS and JavaScript techniques optimized for both mobile and desktop devices.
+                </p>
+            </div>
+
+        </div>
+    </div>
+
+</section>
+
+<section id="services">
+
+    <div class="hidden">
+        <h2 class="section-title">My <span>Services</span></h2>
+
+        <div class="grid">
+
+            <div class="card">
+                <h2>UI/UX Design</h2>
+                <p>
+                    Futuristic interfaces with smooth navigation and modern visual identity.
+                </p>
+            </div>
+
+            <div class="card">
+                <h2>Animation Systems</h2>
+                <p>
+                    Scroll-based transitions, floating effects, cinematic reveals and interactive motion.
+                </p>
+            </div>
+
+            <div class="card">
+                <h2>Responsive Development</h2>
+                <p>
+                    Fully optimized layouts for phones, tablets, laptops and ultra-wide displays.
+                </p>
+            </div>
+
+        </div>
+    </div>
+
+</section>
+
+<section id="projects">
+
+    <div class="hidden">
+        <h2 class="section-title">Featured <span>Projects</span></h2>
+
+        <div class="projects">
+
+            <div class="project">
+                <img src="https://images.unsplash.com/photo-1518770660439-4636190af475?q=80&w=1200&auto=format&fit=crop">
+
+                <div class="overlay">
+                    <h3>Quantum UI</h3>
+                    <p>Cyberpunk-inspired animated interface with holographic motion.</p>
+                </div>
+            </div>
+
+            <div class="project">
+                <img src="https://images.unsplash.com/photo-1504384308090-c894fdcc538d?q=80&w=1200&auto=format&fit=crop">
+
+                <div class="overlay">
+                    <h3>Neural Web</h3>
+                    <p>AI-powered futuristic dashboard with immersive design.</p>
+                </div>
+            </div>
+
+            <div class="project">
+                <img src="https://images.unsplash.com/photo-1516321318423-f06f85e504b3?q=80&w=1200&auto=format&fit=crop">
+
+                <div class="overlay">
+                    <h3>Galaxy Engine</h3>
+                    <p>Advanced parallax website with space-themed interactions.</p>
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+</section>
+
+<section id="contact">
+
+    <div class="hidden">
+        <h2 class="section-title">Get In <span>Touch</span></h2>
+
+        <div class="grid">
+
+            <div class="card">
+                <h2>Email</h2>
+                <p>yourmail@gmail.com</p>
+            </div>
+
+            <div class="card">
+                <h2>Instagram</h2>
+                <p>@yourusername</p>
+            </div>
+
+            <div class="card">
+                <h2>YouTube</h2>
+                <p>Your Channel Name</p>
+            </div>
+
+        </div>
+    </div>
+
+</section>
+
+<footer>
+    © 2026 Cosmic Portfolio — Designed With Space Aesthetics
+</footer>
 
 <script>
 
-const cube = document.getElementById("cube");
+// SCROLL REVEAL
+const observer = new IntersectionObserver((entries)=>{
 
-let rotateX = -30;
-let rotateY = -30;
+    entries.forEach((entry)=>{
 
-let cubies = [];
-
-/* CREATE 27 SMALL CUBES */
-
-function createCube(){
-
-    cube.innerHTML = "";
-    cubies = [];
-
-    for(let x=-1;x<=1;x++){
-        for(let y=-1;y<=1;y++){
-            for(let z=-1;z<=1;z++){
-
-                const cubie = document.createElement("div");
-                cubie.className = "cubie";
-
-                cubie.x = x;
-                cubie.y = y;
-                cubie.z = z;
-
-                createFace(cubie,"front", z===1 ? "green":"black");
-                createFace(cubie,"back", z===-1 ? "blue":"black");
-                createFace(cubie,"right", x===1 ? "red":"black");
-                createFace(cubie,"left", x===-1 ? "orange":"black");
-                createFace(cubie,"top", y===-1 ? "white":"black");
-                createFace(cubie,"bottom", y===1 ? "yellow":"black");
-
-                updatePosition(cubie);
-
-                cube.appendChild(cubie);
-
-                cubies.push(cubie);
-            }
+        if(entry.isIntersecting){
+            entry.target.classList.add('show');
         }
-    }
-}
 
-function createFace(cubie,side,color){
-
-    const face = document.createElement("div");
-
-    face.className = `face ${side} ${color}`;
-
-    cubie.appendChild(face);
-}
-
-function updatePosition(cubie){
-
-    cubie.style.transform =
-    `
-    translate3d(
-    ${cubie.x*60}px,
-    ${cubie.y*60}px,
-    ${cubie.z*60}px
-    )
-    `;
-}
-
-createCube();
-
-/* REAL ROTATIONS */
-
-function rotateLayer(axis, layer, clockwise=true){
-
-    cubies.forEach(c=>{
-
-        if(c[axis] === layer){
-
-            let x = c.x;
-            let y = c.y;
-            let z = c.z;
-
-            if(axis==="x"){
-
-                c.y = clockwise ? -z : z;
-                c.z = clockwise ? y : -y;
-            }
-
-            if(axis==="y"){
-
-                c.x = clockwise ? z : -z;
-                c.z = clockwise ? -x : x;
-            }
-
-            if(axis==="z"){
-
-                c.x = clockwise ? -y : y;
-                c.y = clockwise ? x : -x;
-            }
-
-            updatePosition(c);
-        }
     });
-}
 
-/* MOVE SYSTEM */
+},{threshold:0.2});
 
-function move(m){
+const hiddenElements = document.querySelectorAll('.hidden');
+hiddenElements.forEach((el)=>observer.observe(el));
 
-    switch(m){
+// PARALLAX SCROLL
+window.addEventListener('scroll',()=>{
 
-        case "R": rotateLayer("x",1,true); break;
-        case "Ri": rotateLayer("x",1,false); break;
+    const scrollY = window.scrollY;
+    document.documentElement.style.setProperty('--scroll',scrollY);
 
-        case "L": rotateLayer("x",-1,false); break;
-        case "Li": rotateLayer("x",-1,true); break;
+    const earth = document.querySelector('.earth-wrapper');
+    earth.style.transform = `translateY(calc(-50% + ${scrollY * 0.08}px)) rotate(${scrollY * 0.02}deg)`;
 
-        case "U": rotateLayer("y",-1,true); break;
-        case "Ui": rotateLayer("y",-1,false); break;
-
-        case "D": rotateLayer("y",1,false); break;
-        case "Di": rotateLayer("y",1,true); break;
-
-        case "F": rotateLayer("z",1,true); break;
-        case "Fi": rotateLayer("z",1,false); break;
-
-        case "B": rotateLayer("z",-1,false); break;
-        case "Bi": rotateLayer("z",-1,true); break;
-    }
-}
-
-/* SHUFFLE */
-
-function shuffleCube(){
-
-    const moves = [
-    "R","L","U","D","F","B",
-    "Ri","Li","Ui","Di","Fi","Bi"
-    ];
-
-    for(let i=0;i<20;i++){
-
-        const random =
-        moves[Math.floor(Math.random()*moves.length)];
-
-        move(random);
-    }
-}
-
-/* RESET */
-
-function resetCube(){
-
-    createCube();
-}
-
-/* MOUSE ROTATION */
-
-let dragging = false;
-let lastX,lastY;
-
-document.addEventListener("mousedown",(e)=>{
-
-    dragging = true;
-
-    lastX = e.clientX;
-    lastY = e.clientY;
 });
 
-document.addEventListener("mouseup",()=>{
+// MOUSE GLOW EFFECT
+const cards = document.querySelectorAll('.card');
 
-    dragging = false;
-});
+cards.forEach(card=>{
 
-document.addEventListener("mousemove",(e)=>{
+    card.addEventListener('mousemove',(e)=>{
 
-    if(!dragging) return;
+        const rect = card.getBoundingClientRect();
 
-    let dx = e.clientX - lastX;
-    let dy = e.clientY - lastY;
+        const x = e.clientX - rect.left;
+        const y = e.clientY - rect.top;
 
-    rotateY += dx * 0.5;
-    rotateX -= dy * 0.5;
+        card.style.background = `radial-gradient(circle at ${x}px ${y}px, rgba(0,217,255,0.15), rgba(255,255,255,0.05))`;
 
-    cube.style.transform =
-    `rotateX(${rotateX}deg) rotateY(${rotateY}deg)`;
+    });
 
-    lastX = e.clientX;
-    lastY = e.clientY;
+    card.addEventListener('mouseleave',()=>{
+        card.style.background = 'rgba(255,255,255,0.08)';
+    });
+
 });
 
 </script>
